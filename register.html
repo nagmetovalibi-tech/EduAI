@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <title>Тіркелу | EduAI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: sans-serif; background: #f3f4f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .reg-card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 400px; }
+        h2 { text-align: center; color: #2563eb; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; color: #374151; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; box-sizing: border-box; }
+        .btn-reg { background: #2563eb; color: white; border: none; width: 100%; padding: 15px; border-radius: 10px; cursor: pointer; font-size: 1rem; font-weight: bold; margin-top: 20px; }
+/* =========================================
+   ТҮНГІ РЕЖИМ (DARK MODE) СТИЛЬДЕРІ
+========================================= */
+body.dark-mode {
+    --light-bg: #111827;     /* Негізгі фон қараңғы */
+    --white: #1f2937;        /* Карточкалар фоны */
+    --text-color: #e5e7eb;   /* Жалпы мәтін түсі ақшыл */
+    --dark-bg: #f8fafc;      /* Тақырыптар түсі ақ */
+    background-color: var(--light-bg);
+    color: var(--text-color);
+}
+
+/* Қараңғы режимдегі карточкалар мен блоктар */
+body.dark-mode .card, 
+body.dark-mode .quiz-card, 
+body.dark-mode .reg-card,
+body.dark-mode .profile-card,
+body.dark-mode .stat-box,
+body.dark-mode details, 
+body.dark-mode .lessons-list,
+body.dark-mode .modal-content,
+body.dark-mode .chat-box {
+    background-color: var(--white);
+    color: var(--text-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4, 
+body.dark-mode summary,
+body.dark-mode .question-text {
+    color: var(--dark-bg) !important;
+}
+
+body.dark-mode header, 
+body.dark-mode .header-container {
+    background-color: var(--white);
+    border-bottom: 1px solid #374151;
+}
+
+body.dark-mode input, 
+body.dark-mode select, 
+body.dark-mode textarea {
+    background-color: #374151;
+    color: #fff;
+    border: 1px solid #4b5563;
+}
+
+/* Түнгі режимді ауыстыру батырмасының дизайны */
+.theme-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+}
+.theme-toggle:hover { color: var(--primary-color); }
+
+/* =========================================
+   МОБИЛЬДІ НҰСҚАҒА ОҢТАЙЛАНДЫРУ
+========================================= */
+/* Видеоларды телефонға бейімдеу (16:9) */
+.video-responsive {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; 
+    height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+.video-responsive iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .container { padding: 0 15px; }
+    .grid-cards, .stats-grid { grid-template-columns: 1fr; }
+    .split-layout, .split-layout.reverse { flex-direction: column; }
+    .hero h1 { font-size: 2rem; }
+    header .header-container { flex-direction: column; gap: 15px; height: auto; padding: 15px 0;}
+    nav ul { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 0;}
+    
+    /* Профиль бетіндегі sidebar-ды телефонда жоғары шығару */
+    .sidebar { width: 100%; height: auto; position: relative; padding: 15px; display: flex; overflow-x: auto; gap: 10px;}
+    .sidebar h2 { display: none; } /* Телефонда логотипті жасыруға болады */
+    .main-content { margin-left: 0; width: 100%; padding: 20px 10px; }
+    .profile-card { flex-direction: column; text-align: center; }
+    
+    /* Сабақтар мен модальды терезелер */
+    .lesson-item { flex-direction: column; }
+    .modal-content { width: 95%; padding: 20px; }
+}    
+</style>
+<button class="theme-toggle" onclick="toggleTheme()" title="Түнгі/Күндізгі режим">
+    <i class="fas fa-moon" id="theme-icon"></i>
+</button>
+</head>
+<body>
+    <div class="reg-card">
+        <h2>EduAI-ға тіркелу</h2>
+        <form id="regForm">
+            <div class="form-group">
+                <label>Аты-жөніңіз:</label>
+                <input type="text" id="regName" placeholder="Мысалы: Ақбота Азильханова" required>
+            </div>
+            <div class="form-group">
+                <label>Сыныбыңыз:</label>
+                <select id="regClass">
+                    <option value="9-сынып">9-сынып</option>
+                    <option value="10-сынып">10-сынып</option>
+                    <option value="11-сынып">11-сынып</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Қалаңыз:</label>
+                <input type="text" id="regCity" placeholder="Мысалы: Алматы" required>
+            </div>
+            <button type="submit" class="btn-reg">Оқуды бастау</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('regForm').onsubmit = function(e) {
+            e.preventDefault();
+            // Мәліметтерді сақтау
+            localStorage.setItem('eduai_user_name', document.getElementById('regName').value);
+            localStorage.setItem('eduai_user_class', document.getElementById('regClass').value);
+            localStorage.setItem('eduai_user_city', document.getElementById('regCity').value);
+            localStorage.setItem('eduai_is_registered', 'true');
+            
+            window.location.href = 'index.html.html'; // Басты бетке өту
+        };
+// Түнгі режимді қосу/өшіру және жадта сақтау
+function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.getElementById('theme-icon');
+    body.classList.toggle('dark-mode');
+    
+    if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('eduai_theme', 'dark');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    } else {
+        localStorage.setItem('eduai_theme', 'light');
+        if(themeIcon) themeIcon.className = 'fas fa-moon';
+    }
+}
+
+// Бет жүктелгенде оқушының бұрынғы таңдауын тексеру
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('eduai_theme');
+    const themeIcon = document.getElementById('theme-icon');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    }
+});
+// Түнгі режимді қосу/өшіру және жадта сақтау
+function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.getElementById('theme-icon');
+    body.classList.toggle('dark-mode');
+    
+    if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('eduai_theme', 'dark');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    } else {
+        localStorage.setItem('eduai_theme', 'light');
+        if(themeIcon) themeIcon.className = 'fas fa-moon';
+    }
+}
+
+// Бет жүктелгенде оқушының бұрынғы таңдауын тексеру
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('eduai_theme');
+    const themeIcon = document.getElementById('theme-icon');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    }
+});
+    </script>
+</body>
+</html>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python & AI Тест | EduAI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #2563eb; --secondary: #1e40af; --bg: #f3f4f6; --white: #ffffff; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #374151; line-height: 1.6; padding: 20px; }
+        .quiz-card { max-width: 700px; margin: 40px auto; background: var(--white); padding: 40px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .quiz-header { text-align: center; margin-bottom: 30px; }
+        .question-box { display: none; }
+        .question-box.active { display: block; }
+        .question-text { font-size: 1.3rem; font-weight: bold; margin-bottom: 20px; color: #111827; }
+        .options-list { list-style: none; padding: 0; }
+        .option-item { margin-bottom: 12px; }
+        .option-item label { display: flex; align-items: center; padding: 15px; border: 2px solid #e5e7eb; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+        .option-item input { margin-right: 15px; transform: scale(1.2); }
+        .option-item label:hover { background: #f9fafb; border-color: var(--primary); }
+        .btn-next { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 30px; cursor: pointer; width: 100%; font-size: 1.1rem; font-weight: bold; margin-top: 20px; transition: 0.3s; }
+        .btn-next:hover { background: var(--secondary); transform: translateY(-2px); }
+        .progress-bar { height: 8px; background: #e5e7eb; border-radius: 4px; margin-bottom: 30px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.5s; }
+ /* =========================================
+   ТҮНГІ РЕЖИМ (DARK MODE) СТИЛЬДЕРІ
+========================================= */
+body.dark-mode {
+    --light-bg: #111827;     /* Негізгі фон қараңғы */
+    --white: #1f2937;        /* Карточкалар фоны */
+    --text-color: #e5e7eb;   /* Жалпы мәтін түсі ақшыл */
+    --dark-bg: #f8fafc;      /* Тақырыптар түсі ақ */
+    background-color: var(--light-bg);
+    color: var(--text-color);
+}
+
+/* Қараңғы режимдегі карточкалар мен блоктар */
+body.dark-mode .card, 
+body.dark-mode .quiz-card, 
+body.dark-mode .reg-card,
+body.dark-mode .profile-card,
+body.dark-mode .stat-box,
+body.dark-mode details, 
+body.dark-mode .lessons-list,
+body.dark-mode .modal-content,
+body.dark-mode .chat-box {
+    background-color: var(--white);
+    color: var(--text-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4, 
+body.dark-mode summary,
+body.dark-mode .question-text {
+    color: var(--dark-bg) !important;
+}
+
+body.dark-mode header, 
+body.dark-mode .header-container {
+    background-color: var(--white);
+    border-bottom: 1px solid #374151;
+}
+
+body.dark-mode input, 
+body.dark-mode select, 
+body.dark-mode textarea {
+    background-color: #374151;
+    color: #fff;
+    border: 1px solid #4b5563;
+}
+
+/* Түнгі режимді ауыстыру батырмасының дизайны */
+.theme-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+}
+.theme-toggle:hover { color: var(--primary-color); }
+
+/* =========================================
+   МОБИЛЬДІ НҰСҚАҒА ОҢТАЙЛАНДЫРУ
+========================================= */
+/* Видеоларды телефонға бейімдеу (16:9) */
+.video-responsive {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; 
+    height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+.video-responsive iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .container { padding: 0 15px; }
+    .grid-cards, .stats-grid { grid-template-columns: 1fr; }
+    .split-layout, .split-layout.reverse { flex-direction: column; }
+    .hero h1 { font-size: 2rem; }
+    header .header-container { flex-direction: column; gap: 15px; height: auto; padding: 15px 0;}
+    nav ul { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 0;}
+    
+    /* Профиль бетіндегі sidebar-ды телефонда жоғары шығару */
+    .sidebar { width: 100%; height: auto; position: relative; padding: 15px; display: flex; overflow-x: auto; gap: 10px;}
+    .sidebar h2 { display: none; } /* Телефонда логотипті жасыруға болады */
+    .main-content { margin-left: 0; width: 100%; padding: 20px 10px; }
+    .profile-card { flex-direction: column; text-align: center; }
+    
+    /* Сабақтар мен модальды терезелер */
+    .lesson-item { flex-direction: column; }
+    .modal-content { width: 95%; padding: 20px; }
+}   
+</style>
+</head>
+<body>
+
+<div class="quiz-card">
+    <div class="quiz-header">
+        <h2>Python & AI Білім Тесті</h2>
+        <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<button class="theme-toggle" onclick="toggleTheme()" title="Түнгі/Күндізгі режим">
+    <i class="fas fa-moon" id="theme-icon"></i>
+</button>
+    </div>
+
+    <div id="quiz-content">
+        <div class="question-box active" data-q="1">
+            <p class="question-text">1. Python-да бүтін сандарды сақтауға арналған деректер типі қалай аталады?</p>
+            <div class="options-list">
+                <div class="option-item"><label><input type="radio" name="q1" value="wrong"> float</label></div>
+                <div class="option-item"><label><input type="radio" name="q1" value="correct"> int</label></div>
+                <div class="option-item"><label><input type="radio" name="q1" value="wrong"> string</label></div>
+            </div>
+            <button class="btn-next" onclick="nextQuestion(1, 'correct')">Келесі сұрақ</button>
+<div class="ai-quiz-generator" style="background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 30px; border-radius: 15px; text-align: center; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+    <h3 style="color: white; margin-bottom: 10px;"><i class="fas fa-brain"></i> AI-Адаптивті Тест</h3>
+    <p style="font-size: 1rem; margin-bottom: 20px;">Жүйе сіздің жинаған XP ұпайыңызды талдап, дәл сіздің деңгейіңізге сай келетін жеке тапсырма құрастырады.</p>
+    <button class="btn-next" style="background: white; color: #059669; max-width: 300px; margin: 0 auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1);" onclick="generateAITest()">
+        Жеке тестті жасау <i class="fas fa-cogs"></i>
+    </button>
+</div>
+
+<div id="aiTestContainer" style="display: none; margin-bottom: 30px;">
+    </div>
+        </div>
+
+        <div class="question-box" data-q="2">
+            <p class="question-text">2. Төмендегілердің қайсысы "цикл" операторына жатады?</p>
+            <div class="options-list">
+                <div class="option-item"><label><input type="radio" name="q2" value="correct"> for</label></div>
+                <div class="option-item"><label><input type="radio" name="q2" value="wrong"> if</label></div>
+                <div class="option-item"><label><input type="radio" name="q2" value="wrong"> def</label></div>
+            </div>
+            <button class="btn-next" onclick="nextQuestion(2, 'correct')">Келесі сұрақ</button>
+        </div>
+
+        <div class="question-box" data-q="3">
+            <p class="question-text">3. LLM (Large Language Model) дегеніміз не?</p>
+            <div class="options-list">
+                <div class="option-item"><label><input type="radio" name="q3" value="wrong"> Робот түрі</label></div>
+                <div class="option-item"><label><input type="radio" name="q3" value="correct"> Үлкен тілдік модель</label></div>
+                <div class="option-item"><label><input type="radio" name="q3" value="wrong"> Бағдарламалау тілі</label></div>
+            </div>
+            <button class="btn-next" onclick="nextQuestion(3, 'correct')">Келесі сұрақ</button>
+        </div>
+
+        <div class="question-box" data-q="4">
+            <p class="question-text">4. "Промпт" дегеніміз не?</p>
+            <div class="options-list">
+                <div class="option-item"><label><input type="radio" name="q4" value="wrong"> Компьютердің бөлшегі</label></div>
+                <div class="option-item"><label><input type="radio" name="q4" value="correct"> ЖИ-ге берілетін нұсқаулық</label></div>
+                <div class="option-item"><label><input type="radio" name="q4" value="wrong"> Қателік (Bug)</label></div>
+            </div>
+            <button class="btn-next" onclick="nextQuestion(4, 'correct')">Келесі сұрақ</button>
+        </div>
+
+        <div class="question-box" data-q="5">
+            <p class="question-text">5. Python-да тізім (List) қай жақшамен жазылады?</p>
+            <div class="options-list">
+                <div class="option-item"><label><input type="radio" name="q5" value="wrong"> { }</label></div>
+                <div class="option-item"><label><input type="radio" name="q5" value="correct"> [ ]</label></div>
+                <div class="option-item"><label><input type="radio" name="q5" value="wrong"> ( )</label></div>
+            </div>
+            <button class="btn-next" onclick="finishQuiz(5, 'correct')">Тестті аяқтау</button>
+        </div>
+    </div>
+
+    <div id="quiz-result" style="display:none; text-align:center;">
+        <i class="fas fa-trophy" style="font-size: 4rem; color: #f59e0b; margin-bottom: 20px;"></i>
+        <h2>Құттықтаймыз!</h2>
+        <p id="result-text" style="font-size: 1.2rem; margin: 15px 0;"></p>
+        <p style="color: #10b981; font-weight: bold; font-size: 1.5rem;">+50 XP жинадың!</p>
+        <a href="index.html.html" class="btn-next" style="display:inline-block; text-decoration:none; margin-top:20px;">Басты бетке қайту</a>
+    </div>
+</div>
+
+<script>
+    let score = 0;
+    const totalQuestions = 5;
+
+    function nextQuestion(currentStep, correctValue) {
+        const selected = document.querySelector(`input[name="q${currentStep}"]:checked`);
+        if (!selected) { alert("Жауапты таңдаңыз!"); return; }
+        
+        if (selected.value === correctValue) score++;
+        
+        document.querySelector(`[data-q="${currentStep}"]`).classList.remove('active');
+        document.querySelector(`[data-q="${currentStep + 1}"]`).classList.add('active');
+        updateProgress(currentStep);
+    }
+
+    function updateProgress(step) {
+        document.getElementById('progress').style.width = (step / totalQuestions * 100) + '%';
+    }
+
+    function finishQuiz(currentStep, correctValue) {
+        const selected = document.querySelector(`input[name="q${currentStep}"]:checked`);
+        if (!selected) { alert("Жауапты таңдаңыз!"); return; }
+        if (selected.value === correctValue) score++;
+
+        // XP сақтау
+        let currentXP = localStorage.getItem('eduai_xp') ? parseInt(localStorage.getItem('eduai_xp')) : 0;
+        localStorage.setItem('eduai_xp', currentXP + 50);
+
+        document.getElementById('quiz-content').style.display = 'none';
+        document.getElementById('quiz-result').style.display = 'block';
+        document.getElementById('result-text').innerText = `Сен ${totalQuestions} сұрақтың ${score}-не дұрыс жауап бердің.`;
+        document.getElementById('progress').style.width = '100%';
+    }
+// Түнгі режимді қосу/өшіру және жадта сақтау
+function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.getElementById('theme-icon');
+    body.classList.toggle('dark-mode');
+    
+    if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('eduai_theme', 'dark');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    } else {
+        localStorage.setItem('eduai_theme', 'light');
+        if(themeIcon) themeIcon.className = 'fas fa-moon';
+    }
+}
+
+// Бет жүктелгенде оқушының бұрынғы таңдауын тексеру
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('eduai_theme');
+    const themeIcon = document.getElementById('theme-icon');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    }
+});
+// Түнгі режимді қосу/өшіру және жадта сақтау
+function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.getElementById('theme-icon');
+    body.classList.toggle('dark-mode');
+    
+    if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('eduai_theme', 'dark');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    } else {
+        localStorage.setItem('eduai_theme', 'light');
+        if(themeIcon) themeIcon.className = 'fas fa-moon';
+    }
+}
+
+// Бет жүктелгенде оқушының бұрынғы таңдауын тексеру
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('eduai_theme');
+    const themeIcon = document.getElementById('theme-icon');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    }
+});
+function generateAITest() {
+    const currentXP = localStorage.getItem('eduai_xp') ? parseInt(localStorage.getItem('eduai_xp')) : 0;
+    const container = document.getElementById('aiTestContainer');
+    
+    container.style.display = 'block';
+    container.innerHTML = '<div style="text-align:center; padding: 20px;"><i class="fas fa-spinner fa-spin fa-2x" style="color: #10b981;"></i><br><br>Деңгейіңізді (XP: ' + currentXP + ') талдап, сұрақтарды генерациялаудамыз...</div>';
+
+    setTimeout(() => {
+        let html = '';
+        // Логика: Егер XP аз болса - оңай сұрақ, көп болса - қиын сұрақ
+        if (currentXP < 100) {
+            html = `
+                <div style="background: var(--white); padding: 25px; border-radius: 10px; border-left: 5px solid #3b82f6; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                    <h4 style="color: var(--dark-bg);"><i class="fas fa-chart-line"></i> AI Талдау: Бастапқы деңгей</h4>
+                    <p style="font-size: 1.1rem; margin: 15px 0;"><strong>Сұрақ:</strong> Келесі цикл неше рет орындалады?<br> <code>for i in range(3):</code></p>
+                    <div class="options-list">
+                        <div class="option-item"><label><input type="radio" name="aiq1" value="wrong"> 4 рет</label></div>
+                        <div class="option-item"><label><input type="radio" name="aiq1" value="correct"> 3 рет</label></div>
+                        <div class="option-item"><label><input type="radio" name="aiq1" value="wrong"> Орындалмайды</label></div>
+                    </div>
+                    <button class="btn-next" style="width: auto; padding: 10px 20px; font-size: 1rem;" onclick="checkAITest()">Жауапты тексеру</button>
+                </div>
+            `;
+        } else {
+            html = `
+                <div style="background: var(--white); padding: 25px; border-radius: 10px; border-left: 5px solid #f59e0b; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                    <h4 style="color: var(--dark-bg);"><i class="fas fa-fire"></i> AI Талдау: Күрделі деңгей</h4>
+                    <p style="font-size: 1.1rem; margin: 15px 0;"><strong>Сұрақ:</strong> Тізімнің соңына жаңа элемент қосу үшін қандай әдіс (method) қолданылады?</p>
+                    <div class="options-list">
+                        <div class="option-item"><label><input type="radio" name="aiq1" value="wrong"> .insert()</label></div>
+                        <div class="option-item"><label><input type="radio" name="aiq1" value="correct"> .append()</label></div>
+                        <div class="option-item"><label><input type="radio" name="aiq1" value="wrong"> .add()</label></div>
+                    </div>
+                    <button class="btn-next" style="width: auto; padding: 10px 20px; font-size: 1rem;" onclick="checkAITest()">Жауапты тексеру</button>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }, 2000);
+}
+
+function checkAITest() {
+    const selected = document.querySelector('input[name="aiq1"]:checked');
+    if(!selected) {
+        alert("Алдымен жауапты таңдаңыз!");
+        return;
+    }
+    
+    if(selected.value === 'correct') {
+        alert('Жарайсың! Дұрыс жауап. ЖИ саған +50 XP берді!');
+        let currentXP = localStorage.getItem('eduai_xp') ? parseInt(localStorage.getItem('eduai_xp')) : 0;
+        localStorage.setItem('eduai_xp', currentXP + 50);
+        document.getElementById('aiTestContainer').style.display = 'none';
+    } else {
+        alert('Қате. Бұл ЖИ құрастырған сұрақ болғандықтан сәл қиындау. Теорияны қайта оқып көріңіз!');
+    }
+}
+</script>
+
+</body>
+</html>

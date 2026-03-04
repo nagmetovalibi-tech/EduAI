@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Курс бағдарламасы | EduAI</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Ортақ баптаулар (Басты бетпен бірдей) */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --text-color: #374151;
+            --white: #ffffff;
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { color: var(--text-color); line-height: 1.6; background-color: var(--light-bg); }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+        /* Навигация */
+        header { background: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        .logo { font-size: 24px; font-weight: bold; color: var(--primary-color); display: flex; align-items: center; gap: 10px; text-decoration: none;}
+        nav a { text-decoration: none; color: var(--text-color); font-weight: 500; transition: var(--transition); border: 2px solid transparent; padding: 8px 16px; border-radius: 20px;}
+        nav a:hover { color: var(--primary-color); background: #eff6ff; }
+        .back-btn { display: flex; align-items: center; gap: 8px; }
+
+        /* Тақырып (Hero) */
+        .page-header { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--white); padding: 60px 0; text-align: center; margin-bottom: 40px; border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;}
+        .page-header h1 { font-size: 2.5rem; margin-bottom: 15px; }
+        .page-header p { font-size: 1.1rem; opacity: 0.9; max-width: 700px; margin: 0 auto; }
+
+        /* Аккордеон (Syllabus тізімі) */
+        .syllabus-section { padding-bottom: 80px; }
+        
+        details { background: var(--white); margin-bottom: 15px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; transition: var(--transition); }
+        details[open] { box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        
+        summary { padding: 20px 25px; font-size: 1.2rem; font-weight: bold; color: var(--dark-bg); cursor: pointer; display: flex; align-items: center; list-style: none; position: relative; }
+        summary::-webkit-details-marker { display: none; } /* Safari үшін */
+        summary i { color: var(--primary-color); margin-right: 15px; font-size: 1.5rem; width: 30px; text-align: center;}
+        
+        /* Аккордеон стрелкасы */
+        summary::after { content: '\f107'; font-family: 'Font Awesome 6 Free'; font-weight: 900; position: absolute; right: 25px; transition: transform 0.3s ease; color: #9ca3af; }
+        details[open] summary::after { transform: rotate(180deg); color: var(--primary-color); }
+        details[open] summary { border-bottom: 1px solid #e5e7eb; background: #eff6ff; color: var(--primary-color); }
+
+        /* Сабақтар тізімі */
+        .lessons-list { padding: 25px; background: var(--white); }
+        .lesson-item { display: flex; align-items: flex-start; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed #e5e7eb; gap: 15px; }
+        .lesson-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+        .lesson-number { background: var(--primary-color); color: var(--white); width: 30px; height: 30px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-weight: bold; flex-shrink: 0; font-size: 0.9rem;}
+        .lesson-content h4 { color: var(--dark-bg); margin-bottom: 5px; font-size: 1.1rem; }
+        .lesson-content p { color: #6b7280; font-size: 0.95rem; }
+
+        /* Оқуды бастау батырмасы */
+        .start-course-container { text-align: center; margin-top: 50px; }
+        .btn-large { background: var(--primary-color); color: var(--white); padding: 15px 40px; border-radius: 30px; text-decoration: none; font-size: 1.2rem; font-weight: bold; display: inline-block; transition: var(--transition); box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
+        .btn-large:hover { background: var(--secondary-color); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4); }
+
+        /* Подвал */
+        footer { background: #1f2937; color: var(--white); padding: 30px 0; text-align: center; margin-top: 50px; }
+/* Drag-and-Drop (Блок-схема) үшін */
+        .dnd-container { display: flex; gap: 20px; margin-top: 15px; }
+        .blocks-panel { width: 30%; background: #f3f4f6; padding: 15px; border-radius: 8px; border: 2px dashed #cbd5e1; }
+        .canvas-panel { width: 70%; background: #fff; padding: 15px; border-radius: 8px; border: 2px dashed var(--primary-color); min-height: 200px; display: flex; flex-direction: column; gap: 10px; }
+        .draggable-block { background: var(--primary-color); color: white; padding: 10px 15px; border-radius: 5px; cursor: grab; text-align: center; font-weight: bold; margin-bottom: 10px; }
+        .draggable-block:active { cursor: grabbing; }
+
+        /* AI Debugger үшін */
+        .debugger-container { background: #1f2937; padding: 20px; border-radius: 10px; color: white; margin-top: 15px;}
+        .code-editor { width: 100%; height: 100px; background: #111827; color: #a5b4fc; border: 1px solid #374151; padding: 10px; font-family: monospace; font-size: 1rem; border-radius: 5px; resize: vertical; margin-bottom: 10px;}
+        .ai-hint { background: rgba(16, 185, 129, 0.2); border-left: 4px solid #10b981; padding: 10px; margin-top: 10px; display: none; color: #d1fae5; font-size: 0.9rem;}
+
+        /* Sandbox (Skulpt) үшін */
+        .terminal-output { background: #000; color: #0f0; padding: 15px; border-radius: 5px; font-family: monospace; min-height: 100px; white-space: pre-wrap; margin-top: 10px; }    
+/* =========================================
+   ТҮНГІ РЕЖИМ (DARK MODE) СТИЛЬДЕРІ
+========================================= */
+body.dark-mode {
+    --light-bg: #111827;     /* Негізгі фон қараңғы */
+    --white: #1f2937;        /* Карточкалар фоны */
+    --text-color: #e5e7eb;   /* Жалпы мәтін түсі ақшыл */
+    --dark-bg: #f8fafc;      /* Тақырыптар түсі ақ */
+    background-color: var(--light-bg);
+    color: var(--text-color);
+}
+
+/* Қараңғы режимдегі карточкалар мен блоктар */
+body.dark-mode .card, 
+body.dark-mode .quiz-card, 
+body.dark-mode .reg-card,
+body.dark-mode .profile-card,
+body.dark-mode .stat-box,
+body.dark-mode details, 
+body.dark-mode .lessons-list,
+body.dark-mode .modal-content,
+body.dark-mode .chat-box {
+    background-color: var(--white);
+    color: var(--text-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4, 
+body.dark-mode summary,
+body.dark-mode .question-text {
+    color: var(--dark-bg) !important;
+}
+
+body.dark-mode header, 
+body.dark-mode .header-container {
+    background-color: var(--white);
+    border-bottom: 1px solid #374151;
+}
+
+body.dark-mode input, 
+body.dark-mode select, 
+body.dark-mode textarea {
+    background-color: #374151;
+    color: #fff;
+    border: 1px solid #4b5563;
+}
+
+/* Түнгі режимді ауыстыру батырмасының дизайны */
+.theme-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+}
+.theme-toggle:hover { color: var(--primary-color); }
+
+/* =========================================
+   МОБИЛЬДІ НҰСҚАҒА ОҢТАЙЛАНДЫРУ
+========================================= */
+/* Видеоларды телефонға бейімдеу (16:9) */
+.video-responsive {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; 
+    height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+.video-responsive iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .container { padding: 0 15px; }
+    .grid-cards, .stats-grid { grid-template-columns: 1fr; }
+    .split-layout, .split-layout.reverse { flex-direction: column; }
+    .hero h1 { font-size: 2rem; }
+    header .header-container { flex-direction: column; gap: 15px; height: auto; padding: 15px 0;}
+    nav ul { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 0;}
+    
+    /* Профиль бетіндегі sidebar-ды телефонда жоғары шығару */
+    .sidebar { width: 100%; height: auto; position: relative; padding: 15px; display: flex; overflow-x: auto; gap: 10px;}
+    .sidebar h2 { display: none; } /* Телефонда логотипті жасыруға болады */
+    .main-content { margin-left: 0; width: 100%; padding: 20px 10px; }
+    .profile-card { flex-direction: column; text-align: center; }
+    
+    /* Сабақтар мен модальды терезелер */
+    .lesson-item { flex-direction: column; }
+    .modal-content { width: 95%; padding: 20px; }
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js" type="text/javascript"></script>
+
+</head>
+<body>
+
+    <header>
+        <div class="container header-container">
+            <a href="index.html.html" class="logo">
+                <i class="fas fa-code"></i> EduAI
+            </a>
+<button class="theme-toggle" onclick="toggleTheme()" title="Түнгі/Күндізгі режим">
+    <i class="fas fa-moon" id="theme-icon"></i>
+</button>
+            <nav>
+                <a href="index.html.html" class="back-btn"><i class="fas fa-arrow-left"></i> Басты бетке қайту</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="page-header">
+        <div class="container">
+            <h1>Оқу бағдарламасы (Syllabus)</h1>
+            <p>«Python + GenAI: Болашақ кодерлері» курсы бойынша жоғары сынып оқушыларына арналған толыққанды модульдер тізбегі.</p>
+        </div>
+    </section>
+
+    <section class="syllabus-section container">
+        
+        <details open>
+            <summary><i class="fas fa-sitemap"></i> 1-Модуль: Бағдарламалауға кіріспе және Алгоритмдер</summary>
+            <div class="lessons-list">
+                <div class="lesson-item">
+                    <div class="lesson-number">1</div>
+                    <div class="lesson-content">
+                        <h4>Алгоритм дегеніміз не? Мәселені бөлшектеу өнері</h4>
+                        <p>Күрделі есептерді декомпозициялау және блок-схемалар арқылы алгоритм құру негіздері.</p>
+
+                        <br>
+                        
+                    </div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">2</div>
+                    <div class="lesson-content">
+                        <h4>Python тілімен танысу</h4>
+                        <p>Ортаны орнату (IDLE/Colab) және алғашқы <code>print("Сәлем, Әлем!")</code> коды.</p>
+<div class="lesson-item">
+                    <div class="lesson-number">1</div>
+                    <div class="lesson-content" style="width: 100%;">
+                        <h4>Алгоритм дегеніміз не? Мәселені бөлшектеу өнері</h4>
+                        <p>Күрделі есептерді декомпозициялау және блок-схемалар арқылы алгоритм құру негіздері.</p>
+                        
+                        <div style="margin-top: 15px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px;">
+                            <iframe width="100%" height="315" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Видео сабақ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+<div style="margin-top: 20px; padding: 20px; background: var(--light-bg); border-radius: 10px; border: 1px solid #e5e7eb;">
+    <h4 style="color: var(--dark-bg);"><i class="fas fa-project-diagram"></i> Интерактив: Блок-схема құрастыру</h4>
+    <p style="color: #6b7280; font-size: 0.95rem;">Сол жақтағы блоктарды оң жақтағы тақтаға дұрыс ретпен сүйреп апарыңыз.</p>
+    <div class="dnd-container">
+        <div class="blocks-panel" ondrop="drop(event)" ondragover="allowDrop(event)" id="blocksPanel">
+            <div class="draggable-block" draggable="true" ondragstart="drag(event)" id="block1">Нәтижені шығару (print)</div>
+            <div class="draggable-block" draggable="true" ondragstart="drag(event)" id="block2">Бастау</div>
+            <div class="draggable-block" draggable="true" ondragstart="drag(event)" id="block3">Аяқтау</div>
+            <div class="draggable-block" draggable="true" ondragstart="drag(event)" id="block4">Мәліметтерді енгізу (input)</div>
+        </div>
+        <div class="canvas-panel" ondrop="drop(event)" ondragover="allowDrop(event)" id="canvasPanel">
+            </div>
+    </div>
+</div>
+                        <button class="btn btn-primary" style="margin-top: 15px; padding: 8px 15px; font-size: 0.9rem; border: none; cursor: pointer;" onclick="completeLesson(10, this)">
+                            <i class="fas fa-check"></i> Сабақты аяқтау (+10 XP)
+                        </button>
+                    </div>
+                </div>
+                    </div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">3</div>
+                    <div class="lesson-content">
+                        <h4>Айнымалылар және деректер типтері</h4>
+                        <p>Ақпаратты жадта сақтау. Бүтін сандар (int), жолдар (str), логикалық мәндер (bool).</p>
+                    </div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">4</div>
+                    <div class="lesson-content">
+                        <h4>Интерактивті бағдарламалар</h4>
+                        <p>Пайдаланушыдан мәлімет оқу (<code>input</code> функциясы) және қарапайым математикалық амалдар.</p>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary><i class="fas fa-code-branch"></i> 2-Модуль: Басқару құрылымдары (Логика)</summary>
+            <div class="lessons-list">
+                <div class="lesson-item">
+                    <div class="lesson-number">5</div>
+                    <div class="lesson-content">
+                        <h4>Шартты операторлар</h4>
+                        <p>Бағдарламаның шешім қабылдауы: <code>if</code>, <code>elif</code>, <code>else</code> операторларын қолдану.</p>
+                    </div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">6</div>
+                    <div class="lesson-content">
+                        <h4>Қайталануды басқару (while)</h4>
+                        <p><code>while</code> циклі: Шарт орындалғанша әрекетті тоқтаусыз қайталау логикасы.</p>
+                    </div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">7</div>
+                    <div class="lesson-content">
+                        <h4>Нақты қайталау (for)</h4>
+                        <p><code>for</code> циклі және <code>range()</code> функциясы: Белгілі бір рет қайталанатын алгоритмдер.</p>
+                    </div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">8</div>
+                    <div class="lesson-content">
+                        <h4>Практикалық жұмыс: "Санды тап" ойыны</h4>
+                        <p>Өтілген тақырыптарды біріктіріп, кездейсоқ санды табатын шағын ойын (Guess the number) жазу.</p>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary><i class="fas fa-robot"></i> 3-Модуль: Генеративті Жасанды Интеллект (GenAI)</summary>
+            <div class="lessons-list">
+                <div class="lesson-item">
+                    <div class="lesson-number">9</div>
+                    <div class="lesson-content">
+                        <h4>ЖИ қалай ойлайды?</h4>
+                        <p>Үлкен тілдік модельдердің (LLM - ChatGPT, Gemini) жұмыс принципімен танысу.</p>
+                    </div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">10</div>
+                    <div class="lesson-content">
+                        <h4>Промпт-инжиниринг негіздері</h4>
+                        <p>«Роль + Контекст + Тапсырма» формуласы арқылы нейрожеліге нақты сұраныс жазу мәдениеті.</p>
+<div class="prompt-lab-container" style="background: var(--white); padding: 25px; border-radius: 10px; border: 2px dashed #8b5cf6; margin-top: 20px;">
+    <h4 style="color: #8b5cf6;"><i class="fas fa-flask"></i> Промпт-лаборатория: Формуланы тексеру</h4>
+    <p style="font-size: 0.95rem; margin-bottom: 15px; color: #6b7280;">Мықты промпт = Рөл + Контекст + Тапсырма. Осы үшеуін толтырып, ЖИ-дің қалай жауап беретінін көріңіз.</p>
+    
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+        <input type="text" id="promptRole" placeholder="1. Рөл (мысалы: Сен тәжірибелі Python мұғалімісің...)" style="padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; width: 100%;">
+        <input type="text" id="promptContext" placeholder="2. Контекст (мысалы: Мен 11-сынып оқушысымын, for циклін түсінбей жүрмін...)" style="padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; width: 100%;">
+        <input type="text" id="promptTask" placeholder="3. Тапсырма (мысалы: Маған өмірлік 2 мысалмен түсіндіріп бер...)" style="padding: 12px; border-radius: 8px; border: 1px solid #d1d5db; width: 100%;">
+        
+        <button class="btn-large" style="background: #8b5cf6; border: none; padding: 12px; color: white; border-radius: 8px; cursor: pointer; font-size: 1rem; margin-top: 10px;" onclick="runPromptLab()">
+            Нәтижені көру <i class="fas fa-magic"></i>
+        </button>
+    </div>
+    
+    <div id="promptResult" style="margin-top: 20px; padding: 20px; background: #f8fafc; border-left: 4px solid #8b5cf6; border-radius: 5px; display: none; color: #374151; line-height: 1.6;">
+        </div>
+</div>
+                    </div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">11</div>
+                    <div class="lesson-content">
+                        <h4>Академиялық адалдық және Этика</h4>
+                        <p>ЖИ-ді дайын тапсырманы көшіру үшін емес, жеке тьютор ретінде сауатты пайдалану ережелері.</p>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary><i class="fas fa-handshake"></i> 4-Модуль: Python мен ЖИ-ді біріктіру (Синергия)</summary>
+            <div class="lessons-list">
+                <div class="lesson-item">
+                    <div class="lesson-number">12</div>
+                    <div class="lesson-content">
+                        <h4>AI арқылы қателерді табу (Debugging)</h4>
+                        <p>Кодтағы синтаксистік немесе логикалық қателерді ЖИ көмегімен іздеу және түзетуді үйрену.</p>
+<div class="debugger-container">
+    <h4 style="color: white;"><i class="fas fa-bug"></i> AI Debugger: Кодтағы қатені тап</h4>
+    <p style="font-size: 0.9rem; margin-bottom: 10px; color: #cbd5e1;">Төмендегі кодта синтаксистік қате бар. Оны тауып, түзетіңіз немесе ЖИ-ден көмек сұраңыз.</p>
+    <textarea class="code-editor" id="debugCode">
+def say_hello(name):
+    print("Сәлем, " + name
+say_hello("EduAI")
+    </textarea>
+    <div style="display: flex; gap: 10px;">
+        <button class="btn-primary" style="padding: 8px 15px; font-size: 0.9rem; border: none; border-radius: 5px; cursor: pointer;" onclick="checkDebug()">Кодты тексеру</button>
+        <button style="padding: 8px 15px; font-size: 0.9rem; border: 1px solid #10b981; background: transparent; color: #10b981; border-radius: 5px; cursor: pointer;" onclick="showAIHint()"><i class="fas fa-robot"></i> ЖИ көмегі</button>
+    </div>
+    <div class="ai-hint" id="aiHint">
+        <strong>AI Ментор:</strong> Байқауымша, 2-жолда <code>print()</code> функциясының жақшасы жабылмаған сияқты. Соңғы жағын тексеріп көріңіз!
+    </div>
+</div>                    
+</div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">13</div>
+                    <div class="lesson-content">
+                        <h4>Бөтен кодты оқу өнері</h4>
+                        <p>Күрделі кодтардың мағынасын ЖИ арқылы талдау және оған түсініктемелер (comments) жаздыру.</p>
+                    </div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">14</div>
+                    <div class="lesson-content">
+                        <h4>Деректер құрылымы (Тізімдер)</h4>
+                        <p>Тізімдермен (Lists) жұмыс істеуді ЖИ ұсынған өмірлік мысалдар арқылы жылдам меңгеру.</p>
+                    </div>
+                </div>
+            </div>
+        </details>
+
+        <details>
+            <summary><i class="fas fa-trophy"></i> 5-Модуль: Қорытынды жоба (PBL)</summary>
+            <div class="lessons-list">
+                <div class="lesson-item">
+                    <div class="lesson-number">15</div>
+                    <div class="lesson-content">
+                        <h4>Жобаны жоспарлау</h4>
+                        <p>Болашақ қосымшаның архитектурасын сызу және оны декомпозициялау.</p>
+                    </div>
+                </div>
+                <div class="lesson-item">
+                    <div class="lesson-number">16</div>
+                    <div class="lesson-content">
+                        <h4>Викторина (Quiz) немесе Чат-бот әзірлеу</h4>
+                        <p>ЖИ көмекші ретінде (идея беру, қатені жөндеу) пайдаланып, толыққанды өнімді өз қолмен жазып шығу.</p>
+                    </div>
+                </div>
+            </div>
+        </details>
+          <div style="margin-top: 40px; background: var(--white); padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+            <h3 style="color: var(--dark-bg); margin-bottom: 15px; font-size: 1.5rem;">
+                <i class="fas fa-laptop-code" style="color: var(--primary-color);"></i> Тәжірибе алаңы: Код жазып көріңіз
+            </h3>
+            <p style="margin-bottom: 20px; color: #6b7280;">Оқыған теорияңызды бірден осы жерде тексеріңіз. Төмендегі терезеге Python кодын жазып, "Run" батырмасын басыңыз.</p>
+            <div style="margin-top: 40px; background: var(--white); padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+    <h3 style="color: var(--dark-bg); margin-bottom: 15px; font-size: 1.5rem;">
+        <i class="fas fa-laptop-code" style="color: var(--primary-color);"></i> Тәжірибе алаңы: Код жазып көріңіз
+    </h3>
+    <p style="margin-bottom: 20px; color: #6b7280;">Оқыған теорияңызды бірден осы жерде тексеріңіз. Код сәтті орындалса, +20 XP беріледі!</p>
+    
+    <textarea id="pythonCode" style="width: 100%; height: 150px; background: #1e293b; color: #fff; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 1.1rem; border: none; resize: vertical;">print("Сәлем, EduAI!")</textarea>
+    
+    <button style="margin-top: 15px; background: #10b981; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;" onclick="runPython()">
+        <i class="fas fa-play"></i> Кодты іске қосу
+    </button>
+    
+    <div class="terminal-output" id="output">Нәтиже осында шығады...</div>
+</div>
+        </div>
+        <div class="start-course-container">
+            <a href="#" class="btn-large">1-сабақты бастау <i class="fas fa-play" style="margin-left: 10px;"></i></a>
+        </div>
+
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2026 EduAI. Барлық құқықтар қорғалған. Білім беру мақсатында әзірленген.</p>
+        </div>
+    </footer>
+<script>
+        function completeLesson(xp, btnElement) {
+            // Егер батырма бұрын басылған болса, ештеңе істемейміз
+            if(btnElement.disabled) return;
+
+            // Локалды жадтан бұрынғы ұпайды алу
+            let currentXP = localStorage.getItem('eduai_xp') ? parseInt(localStorage.getItem('eduai_xp')) : 0;
+            
+            // Жаңа ұпай қосу
+            currentXP += xp;
+            localStorage.setItem('eduai_xp', currentXP);
+            
+            // Батырманың дизайнын өзгерту (жасыл түс)
+            btnElement.innerHTML = '<i class="fas fa-check-double"></i> Аяқталды';
+            btnElement.style.backgroundColor = '#10b981'; // Жасыл түс
+            btnElement.style.boxShadow = 'none';
+            btnElement.disabled = true;
+            
+            // Оқушыны құттықтау
+            alert('Жарайсың! Саған ' + xp + ' XP қосылды. Басты беттегі "Жеке кабинеттен" өз прогрессіңді көре аласың!');
+        }
+// --- 1. DRAG AND DROP ЛОГИКАСЫ ---
+        function allowDrop(ev) { ev.preventDefault(); }
+        function drag(ev) { ev.dataTransfer.setData("text", ev.target.id); }
+        function drop(ev) {
+            ev.preventDefault();
+            var data = ev.dataTransfer.getData("text");
+            if(ev.target.id === "canvasPanel" || ev.target.id === "blocksPanel") {
+                ev.target.appendChild(document.getElementById(data));
+            }
+        }
+
+        // --- 2. AI DEBUGGER ЛОГИКАСЫ ---
+        function showAIHint() {
+            document.getElementById('aiHint').style.display = 'block';
+        }
+
+        function checkDebug() {
+            let code = document.getElementById('debugCode').value;
+            if(code.includes('print("Сәлем, " + name)') || code.includes("print('Сәлем, ' + name)")) {
+                alert("Жарайсың! Қатені сәтті таптың. +15 XP қосылды!");
+                document.getElementById('aiHint').style.display = 'none';
+                let currentXP = localStorage.getItem('eduai_xp') ? parseInt(localStorage.getItem('eduai_xp')) : 0;
+                localStorage.setItem('eduai_xp', currentXP + 15);
+            } else {
+                alert("Кодта әлі де қате бар сияқты. ЖИ көмегін сұрап көр!");
+            }
+        }
+
+        // --- 3. SKULPT (PYTHON ОРЫНДАУ) ЛОГИКАСЫ ---
+        function outf(text) { 
+            var mypre = document.getElementById("output"); 
+            mypre.innerHTML = mypre.innerHTML + text; 
+        } 
+        function builtinRead(x) {
+            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+                    throw "File not found: '" + x + "'";
+            return Sk.builtinFiles["files"][x];
+        }
+
+        function runPython() { 
+            var prog = document.getElementById("pythonCode").value; 
+            var mypre = document.getElementById("output"); 
+            mypre.innerHTML = ''; 
+            Sk.pre = "output";
+            Sk.configure({output:outf, read:builtinRead}); 
+            
+            var myPromise = Sk.misceval.asyncToPromise(function() {
+                return Sk.importMainWithBody("<stdin>", false, prog, true);
+            });
+            
+            myPromise.then(function(mod) {
+                if(!localStorage.getItem('sandbox_xp_awarded')) {
+                    let currentXP = localStorage.getItem('eduai_xp') ? parseInt(localStorage.getItem('eduai_xp')) : 0;
+                    localStorage.setItem('eduai_xp', currentXP + 20);
+                    localStorage.setItem('sandbox_xp_awarded', 'true');
+                    document.getElementById('output').innerHTML += "\n\n[Жүйе: Код сәтті орындалды! +20 XP берілді]";
+                }
+            },
+            function(err) {
+                mypre.innerHTML = "<span style='color: #ef4444;'>" + err.toString() + "</span>";
+            });
+        }
+// Түнгі режимді қосу/өшіру және жадта сақтау
+function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.getElementById('theme-icon');
+    body.classList.toggle('dark-mode');
+    
+    if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('eduai_theme', 'dark');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    } else {
+        localStorage.setItem('eduai_theme', 'light');
+        if(themeIcon) themeIcon.className = 'fas fa-moon';
+    }
+}
+
+// Бет жүктелгенде оқушының бұрынғы таңдауын тексеру
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('eduai_theme');
+    const themeIcon = document.getElementById('theme-icon');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    }
+});
+function runPromptLab() {
+    const role = document.getElementById('promptRole').value.trim();
+    const context = document.getElementById('promptContext').value.trim();
+    const task = document.getElementById('promptTask').value.trim();
+    const resultBox = document.getElementById('promptResult');
+
+    if(!role || !context || !task) {
+        alert("Толық нәтиже көру үшін барлық 3 жолақты (Рөл, Контекст, Тапсырма) толтырыңыз!");
+        return;
+    }
+
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ЖИ сұранысты өңдеуде...';
+
+    // API-ді имитациялау
+    setTimeout(() => {
+        resultBox.innerHTML = `
+            <strong><i class="fas fa-robot"></i> EduAI Assistant:</strong><br><br>
+            Сәлем! Мен сіздің сұранысыңызды алдым. Сіз маған <b>"${role}"</b> рөлін бердіңіз. <br><br>
+            <b>"${context}"</b> жағдайын ескере отырып, <b>"${task}"</b> тапсырмасын орындаймын:<br><br>
+            <em>(Бұл ЖИ-дің симуляциялық жауабы. Нақты өмірде осы 3 элементті қолдансаңыз, нейрожелі сізге дәл оқушыға түсінікті тілде, өмірлік мысалдармен керемет конспект жазып берер еді. Промпт құрылымы өте дұрыс жасалған! +15 XP)</em>
+        `;
+        
+        // Оқушыға промпт жасағаны үшін XP беру
+        let currentXP = localStorage.getItem('eduai_xp') ? parseInt(localStorage.getItem('eduai_xp')) : 0;
+        localStorage.setItem('eduai_xp', currentXP + 15);
+    }, 1500);
+}
+    </script>
+
+</body>
+</html>

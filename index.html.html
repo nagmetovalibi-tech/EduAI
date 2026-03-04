@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduAI | Программалау және Жасанды Интеллект</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <style>
+        /* Жалпы баптаулар */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --dark-bg: #111827;
+            --light-bg: #f3f4f6;
+            --text-color: #374151;
+            --white: #ffffff;
+            --transition: all 0.3s ease;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; scroll-behavior: smooth; }
+        body { color: var(--text-color); line-height: 1.6; position: relative; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Навигация */
+        header { background: var(--white); box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: sticky; top: 0; z-index: 1000; }
+        .header-container { display: flex; justify-content: space-between; align-items: center; height: 80px; }
+        .logo { font-size: 24px; font-weight: bold; color: var(--primary-color); display: flex; align-items: center; gap: 10px; }
+        nav ul { display: flex; list-style: none; gap: 30px; }
+        nav a { text-decoration: none; color: var(--text-color); font-weight: 500; transition: var(--transition); cursor: pointer; }
+        nav a:hover { color: var(--primary-color); }
+
+        /* Басты экран */
+        .hero { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); color: var(--white); padding: 100px 0; text-align: center; }
+        .hero h1 { font-size: 3rem; margin-bottom: 20px; }
+        .hero p { font-size: 1.2rem; max-width: 700px; margin: 0 auto 30px; opacity: 0.9; }
+        
+        .btn { display: inline-block; padding: 12px 30px; border-radius: 30px; text-decoration: none; font-weight: bold; transition: var(--transition); border: none; cursor: pointer; font-size: 1rem; }
+        .btn-primary { background: var(--white); color: var(--primary-color); }
+        .btn-primary:hover { background: var(--light-bg); transform: translateY(-2px); }
+        .btn-outline { background: transparent; color: var(--white); border: 2px solid var(--white); }
+        .btn-outline:hover { background: var(--white); color: var(--primary-color); }
+
+        /* Секциялар */
+        .content-section, .goals-section, .teachers-section { padding: 80px 0; }
+        .bg-light { background: var(--light-bg); }
+        .bg-dark { background: var(--dark-bg); }
+        .section-title { text-align: center; font-size: 2.2rem; margin-bottom: 50px; color: var(--dark-bg); }
+        .text-white { color: var(--white); }
+        .text-center { text-align: center; }
+
+        /* Карточкалар */
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .card { background: var(--white); padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; transition: var(--transition); }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+        .card i { font-size: 40px; color: var(--primary-color); margin-bottom: 20px; }
+        .card h3 { margin-bottom: 15px; color: var(--dark-bg); }
+
+        /* Екі бағаналы орналасу */
+        .split-layout { display: flex; align-items: center; gap: 50px; }
+        .split-layout.reverse { flex-direction: row-reverse; }
+        .text-content { flex: 1; }
+        .text-content h3 { font-size: 1.8rem; margin-bottom: 20px; color: var(--dark-bg); }
+        .feature-list { list-style: none; margin-top: 20px; }
+        .feature-list li { margin-bottom: 15px; display: flex; align-items: center; gap: 10px; font-weight: 500;}
+        .feature-list i { color: var(--primary-color); font-size: 20px; }
+        
+        .code-box { background: #1f2937; color: #a5b4fc; padding: 15px; border-radius: 8px; font-family: monospace; margin-top: 15px; }
+
+        /* Мұғалімдер бөлімі */
+        .teachers-grid .card.outline { background: transparent; border: 1px solid #374151; text-align: left; }
+        .teachers-grid .card.outline h4 { color: var(--white); font-size: 1.2rem; margin-bottom: 15px; }
+        .teachers-grid .card.outline p { color: #9ca3af; margin-bottom: 20px; }
+        .action-link { color: #60a5fa; text-decoration: none; font-weight: bold; display: flex; align-items: center; gap: 5px; cursor: pointer; border: none; background: none; font-size: 1rem;}
+        .action-link:hover { color: var(--white); }
+
+        /* Модальды терезелер (Popup) */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; }
+        .modal-content { background: var(--white); padding: 40px; border-radius: 10px; max-width: 600px; width: 90%; position: relative; animation: slideIn 0.3s ease; }
+        @keyframes slideIn { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #6b7280; }
+        .close-modal:hover { color: var(--dark-bg); }
+
+        /* ЖИ Ассистенті (Chatbot) */
+        .chat-widget { position: fixed; bottom: 30px; right: 30px; z-index: 1500; }
+        .chat-toggle { width: 60px; height: 60px; background: var(--primary-color); color: white; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4); transition: var(--transition); border: none; }
+        .chat-toggle:hover { transform: scale(1.1); }
+        
+        .chat-box { display: none; width: 350px; height: 450px; background: white; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); flex-direction: column; overflow: hidden; position: absolute; bottom: 80px; right: 0; animation: fadeUp 0.3s ease; }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .chat-header { background: var(--primary-color); color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; font-weight: bold; }
+        .close-chat { cursor: pointer; background: none; border: none; color: white; font-size: 16px; }
+        
+        .chat-messages { flex: 1; padding: 15px; overflow-y: auto; background: #f9fafb; display: flex; flex-direction: column; gap: 10px; }
+        .message { padding: 10px 15px; border-radius: 15px; max-width: 80%; font-size: 0.9rem; }
+        .bot-message { background: #e5e7eb; align-self: flex-start; border-bottom-left-radius: 0; color: var(--dark-bg); }
+        .user-message { background: var(--primary-color); color: white; align-self: flex-end; border-bottom-right-radius: 0; }
+        
+        .chat-input-area { padding: 15px; border-top: 1px solid #e5e7eb; display: flex; gap: 10px; background: white; }
+        .chat-input-area input { flex: 1; padding: 10px; border: 1px solid #d1d5db; border-radius: 20px; outline: none; }
+        .chat-input-area button { background: var(--primary-color); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; transition: 0.2s; }
+        .chat-input-area button:hover { background: var(--secondary-color); }
+
+        /* Подвал */
+        footer { background: #1f2937; color: var(--white); padding: 50px 0 20px; }
+        .footer-content { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 30px; margin-bottom: 30px; }
+        .footer-info { max-width: 400px; }
+        .footer-info .logo { color: var(--white); margin-bottom: 15px; }
+        .footer-links ul { list-style: none; }
+        .footer-links a { color: #9ca3af; text-decoration: none; transition: var(--transition); }
+        .footer-links a:hover { color: var(--white); }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid #374151; color: #9ca3af; }
+
+        @media (max-width: 768px) {
+            .split-layout, .split-layout.reverse { flex-direction: column; }
+            .header-container { flex-direction: column; height: auto; padding: 20px 0; gap: 20px; }
+            .chat-box { width: 300px; right: -10px; }
+        }
+/* =========================================
+   ТҮНГІ РЕЖИМ (DARK MODE) СТИЛЬДЕРІ
+========================================= */
+body.dark-mode {
+    --light-bg: #111827;     /* Негізгі фон қараңғы */
+    --white: #1f2937;        /* Карточкалар фоны */
+    --text-color: #e5e7eb;   /* Жалпы мәтін түсі ақшыл */
+    --dark-bg: #f8fafc;      /* Тақырыптар түсі ақ */
+    background-color: var(--light-bg);
+    color: var(--text-color);
+}
+
+/* Қараңғы режимдегі карточкалар мен блоктар */
+body.dark-mode .card, 
+body.dark-mode .quiz-card, 
+body.dark-mode .reg-card,
+body.dark-mode .profile-card,
+body.dark-mode .stat-box,
+body.dark-mode details, 
+body.dark-mode .lessons-list,
+body.dark-mode .modal-content,
+body.dark-mode .chat-box {
+    background-color: var(--white);
+    color: var(--text-color);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+body.dark-mode h1, 
+body.dark-mode h2, 
+body.dark-mode h3, 
+body.dark-mode h4, 
+body.dark-mode summary,
+body.dark-mode .question-text {
+    color: var(--dark-bg) !important;
+}
+
+body.dark-mode header, 
+body.dark-mode .header-container {
+    background-color: var(--white);
+    border-bottom: 1px solid #374151;
+}
+
+body.dark-mode input, 
+body.dark-mode select, 
+body.dark-mode textarea {
+    background-color: #374151;
+    color: #fff;
+    border: 1px solid #4b5563;
+}
+
+/* Түнгі режимді ауыстыру батырмасының дизайны */
+.theme-toggle {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-left: 15px;
+    display: flex;
+    align-items: center;
+}
+.theme-toggle:hover { color: var(--primary-color); }
+
+/* =========================================
+   МОБИЛЬДІ НҰСҚАҒА ОҢТАЙЛАНДЫРУ
+========================================= */
+/* Видеоларды телефонға бейімдеу (16:9) */
+.video-responsive {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; 
+    height: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+.video-responsive iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .container { padding: 0 15px; }
+    .grid-cards, .stats-grid { grid-template-columns: 1fr; }
+    .split-layout, .split-layout.reverse { flex-direction: column; }
+    .hero h1 { font-size: 2rem; }
+    header .header-container { flex-direction: column; gap: 15px; height: auto; padding: 15px 0;}
+    nav ul { flex-wrap: wrap; justify-content: center; gap: 10px; padding: 0;}
+    
+    /* Профиль бетіндегі sidebar-ды телефонда жоғары шығару */
+    .sidebar { width: 100%; height: auto; position: relative; padding: 15px; display: flex; overflow-x: auto; gap: 10px;}
+    .sidebar h2 { display: none; } /* Телефонда логотипті жасыруға болады */
+    .main-content { margin-left: 0; width: 100%; padding: 20px 10px; }
+    .profile-card { flex-direction: column; text-align: center; }
+    
+    /* Сабақтар мен модальды терезелер */
+    .lesson-item { flex-direction: column; }
+    .modal-content { width: 95%; padding: 20px; }
+}
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-container">
+            <div class="logo">
+                <i class="fas fa-code"></i> EduAI 
+            </div>
+<button class="theme-toggle" onclick="toggleTheme()" title="Түнгі/Күндізгі режим">
+    <i class="fas fa-moon" id="theme-icon"></i>
+</button>
+            <nav>
+    <ul style="display: flex; align-items: center; gap: 20px;">
+        <li><a href="#home">Басты бет</a></li>
+        <li><a href="#goals">Міндеттеріміз</a></li>
+        <li><a href="profile.html" style="color: var(--primary-color); font-weight: bold; border: 1px solid var(--primary-color); padding: 5px 15px; border-radius: 20px;">
+            <i class="fas fa-user-circle"></i> Жеке кабинет
+        </a></li>
+        <li><a href="#theory">Теория</a></li>
+        <li><a href="#genai">Жасанды Интеллект</a></li>
+        <li><a href="#teachers">Әдістеме</a></li>
+    </ul>
+</nav>
+        </div>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="container hero-content">
+            <h1>Программалау әлеміне және ЖИ құралдарына қадам бас!</h1>
+            <p>Жоғары сынып оқушыларына арналған Python бағдарламалау тілі мен Генеративті ЖИ құралдарын (ChatGPT, Gemini) тиімді пайдалануды үйрететін оқу платформасы.</p>
+            <button class="btn btn-primary" onclick="openModal('courseModal')">Оқуды бастау</button>
+            <button class="btn btn-outline" style="margin-left: 10px;" onclick="openModal('syllabusModal')">Курс бағдарламасы</button>
+
+
+<a href="quiz.html" class="btn btn-primary" style="background: #10b981; color: white; margin-left: 10px;">
+    <i class="fas fa-tasks"></i> Білімді тексеру (Quiz)
+</a>
+        </div>
+    </section>
+<section class="container" style="margin-top: -40px; position: relative; z-index: 10;">
+        <div style="background: var(--white); padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+            <div>
+                <h3 style="color: var(--dark-bg); margin-bottom: 5px;"><i class="fas fa-user-graduate" style="color: var(--primary-color);"></i> Сіздің оқу үлгеріміңіз</h3>
+                <p style="color: #6b7280; font-size: 0.95rem;">Курсты толық аяқтауға қанша қалғанын бақылаңыз</p>
+            </div>
+            <div style="flex: 1; max-width: 500px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold;">
+                    <span style="color: var(--primary-color);">Жинаған ұпай: <span id="userXP">0</span> XP</span>
+                    <span><span id="userProgressPercent">0</span>%</span>
+                </div>
+                <div style="width: 100%; background-color: #e5e7eb; border-radius: 10px; height: 12px; overflow: hidden;">
+                    <div id="progressBar" style="width: 0%; height: 100%; background-color: var(--primary-color); transition: width 0.5s ease;"></div>
+                </div>
+            </div>
+            <a href="course.html.html" class="btn btn-primary" style="background: var(--primary-color); color: white;">Сабақты жалғастыру</a>
+        </div>
+    </section>
+    <section id="goals" class="goals-section">
+        <div class="container">
+            <h2 class="section-title">Платформаның басты міндеттері</h2>
+            <div class="grid-cards">
+                <div class="card">
+                    <i class="fas fa-book-open"></i>
+                    <h3>Теория мен Практика</h3>
+                    <p>Программалау бойынша теориялық білімді тереңдетіп, нақты код жазу дағдыларын арттыру.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-brain"></i>
+                    <h3>Логикалық талдау</h3>
+                    <p>Алгоритмдік ойлау қабілетін және күрделі мәселелерді бөлшектеп шешу (декомпозиция) дағдыларын дамыту.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-robot"></i>
+                    <h3>ЖИ Мәдениеті</h3>
+                    <p>Генеративті жасанды интеллект құралдарын саналы, этикалық тұрғыда әрі тиімді пайдалануды үйрену.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-fire"></i>
+                    <h3>Оқу Мотивациясы</h3>
+                    <p>Интерактивті тапсырмалар арқылы IT саласына деген қызығушылықты жоғарылату.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="theory" class="content-section bg-light">
+        <div class="container">
+            <h2 class="section-title">Программалау негіздері</h2>
+            <div class="split-layout">
+                <div class="text-content">
+                    <h3>Python арқылы алгоритмдік ойлау</h3>
+                    <p>Код жазу — бұл жай ғана мәтін теру емес, бұл компьютерге түсінікті тілде тапсырма беру. Біз ең қарапайым алгоритмдерден бастап, күрделі логикалық құрылымдарға дейін қарастырамыз.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i> Айнымалылар және деректер типтері</li>
+                        <li><i class="fas fa-check-circle"></i> Шартты операторлар (if, elif, else)</li>
+                        <li><i class="fas fa-check-circle"></i> Циклдер (for, while) арқылы қайталануды басқару</li>
+                    </ul>
+                    <div class="code-box">
+                        # Қарапайым цикл мысалы<br>
+                        for i in range(1, 6):<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;print(f"Қадам: {i}")
+                    </div>
+                    <br>
+                    <button class="btn btn-primary" onclick="openModal('pythonModal')">Толық оқу</button>
+                </div>
+                <div class="text-content text-center">
+                    <i class="fab fa-python" style="font-size: 150px; color: #3776ab;"></i>
+                    <h3 style="margin-top: 20px;">Python — ең оңтайлы тіл</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="genai" class="content-section">
+        <div class="container">
+            <h2 class="section-title">Генеративті Жасанды Интеллект (GenAI)</h2>
+            <div class="split-layout reverse">
+                <div class="text-content">
+                    <h3>ЖИ құралдарын саналы пайдалану мәдениеті</h3>
+                    <p>Нейрожелілер (ChatGPT, Gemini) сіздің орныңызға үй жұмысын жасайтын құрал емес. Олар — сіздің жеке тәлімгеріңіз. Олармен дұрыс сөйлесу (промпт-инжиниринг) арнайы дағдыны талап етеді.</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-magic"></i> Дұрыс промпт формуласы: Роль + Тапсырма + Контекст</li>
+                        <li><i class="fas fa-bug"></i> Кодтағы қателерді (Syntax Error) ЖИ арқылы табу</li>
+                        <li><i class="fas fa-balance-scale"></i> Академиялық адалдық (Плагиатқа жол бермеу)</li>
+                    </ul>
+                </div>
+                <div class="text-content text-center">
+                    <i class="fas fa-robot" style="font-size: 150px; color: #10b981;"></i>
+                    <h3 style="margin-top: 20px;">AI Assistant</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="teachers" class="teachers-section bg-dark">
+        <div class="container">
+            <h2 class="section-title text-white">Мұғалімдерге арналған әдістемелік бұрыш</h2>
+            <p class="text-center text-light-gray">Мектеп тәжірибесінде қолдануға болатын программалау дағдыларын дамытуға арналған ұсыныстар мен сабақ жоспарлары.</p>
+            <div class="grid-cards teachers-grid">
+                <div class="card outline">
+                    <h4>Сабақ жоспарлары</h4>
+                    <p>Python және ЖИ кіріктірілген дайын 45 минуттық сабақ конспектілері.</p>
+                    <button class="action-link" onclick="openModal('teacherModal')">Жүктеп алу <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <div class="card outline">
+                    <h4>Зерттеу материалдары</h4>
+                    <p>Цифрлық білім беру ресурстарын оқу процесіне енгізу бойынша мақалалар.</p>
+                    <button class="action-link" onclick="openModal('teacherModal')">Оқу <i class="fas fa-arrow-right"></i></button>
+                </div>
+                <div class="card outline">
+                    <h4>Бағалау критерийлері</h4>
+                    <p>Оқушылардың ЖИ көмегімен жасаған жобаларын бағалау рубрикаторлары.</p>
+                    <button class="action-link" onclick="openModal('teacherModal')">Қарау <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+<section id="portfolio" class="content-section bg-light">
+        <div class="container">
+            <h2 class="section-title">Оқушылардың жобалар портфолиосы</h2>
+            <p class="text-center" style="margin-top: -30px; margin-bottom: 40px; color: #6b7280;">Курс соңында сіз өз қолыңызбен жасайтын нақты қосымшалар</p>
+            <div class="grid-cards">
+                <div class="card">
+                    <i class="fas fa-calculator" style="color: #f59e0b;"></i>
+                    <h3>Ақылды Калькулятор</h3>
+                    <p>Python-да математикалық амалдар мен күрделі формулаларды есептейтін визуалды қосымша.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-gamepad" style="color: #8b5cf6;"></i>
+                    <h3>Мәтіндік Ойын (Quest)</h3>
+                    <p>Шартты операторлар мен циклдерді қолданып, тармақталған сюжеті бар логикалық ойын құрастыру.</p>
+                </div>
+                <div class="card">
+                    <i class="fas fa-robot" style="color: #10b981;"></i>
+                    <h3>AI Чат-бот</h3>
+                    <p>ЖИ (Gemini немесе ChatGPT) API-ын жалғап, сұрақтарға жауап беретін жеке телеграм-бот жасау.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="feedback" class="content-section">
+        <div class="container">
+            <h2 class="section-title">Кері байланыс</h2>
+            <div style="max-width: 600px; margin: 0 auto; background: var(--white); padding: 40px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                <p style="text-align: center; margin-bottom: 20px;">Тақырыпты түсінбедіңіз бе? Немесе сайтқа ұсынысыңыз бар ма? Бізге жазыңыз!</p>
+                <form style="display: flex; flex-direction: column; gap: 15px;" onsubmit="event.preventDefault(); alert('Хабарламаңыз сәтті жіберілді! Рақмет!'); this.reset();">
+                    <input type="text" placeholder="Аты-жөніңіз" required style="padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; font-size: 1rem;">
+                    <input type="email" placeholder="Email (міндетті емес)" style="padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; font-size: 1rem;">
+                    <textarea placeholder="Сұрағыңыз немесе пікіріңізді осында жазыңыз..." rows="5" required style="padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; outline: none; font-size: 1rem; resize: vertical;"></textarea>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; border: none; font-size: 1.1rem; padding: 15px;">Хабарламаны жіберу <i class="fas fa-paper-plane" style="margin-left: 5px;"></i></button>
+                </form>
+            </div>
+        </div>
+    </section>
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-info">
+                <div class="logo"><i class="fas fa-code"></i> EduAI</div>
+                <p>Оқушылардың цифрлық болашағына арналған заманауи білім беру платформасы.</p>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Барлық құқықтар қорғалған. Білім беру мақсатында әзірленген.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="courseModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('courseModal')">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 15px;">Оқуды бастау</h2>
+            <p>Құрметті оқушы! Бұл платформада сіз Python тілін нөлден бастап үйренесіз. Бірінші сабақ "Алгоритмдер және олардың түрлері" деп аталады.</p>
+            <p style="margin-top: 10px;">Жақында мұнда тіркелу формасы және жеке кабинет қосылады!</p>
+            <button class="btn btn-primary" style="margin-top: 20px;" onclick="closeModal('courseModal')">Жабу</button>
+        </div>
+    </div>
+
+    <div id="pythonModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('pythonModal')">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 15px;">Python Сабақтары</h2>
+            <p>Бұл бөлімде сіз келесі тақырыптарды меңгересіз:</p>
+            <ul style="margin: 15px 0 15px 20px;">
+                <li>Кіріс және шығыс функциялары (print, input)</li>
+                <li>Математикалық амалдар</li>
+                <li>Тізімдер (Lists) және Сөздіктер (Dictionaries)</li>
+                <li>Функциялар құру (def)</li>
+            </ul>
+            <button class="btn btn-primary" onclick="closeModal('pythonModal')">Түсінікті</button>
+        </div>
+    </div>
+
+    <div id="teacherModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal('teacherModal')">&times;</span>
+            <h2 style="color: var(--primary-color); margin-bottom: 15px;">Әдістемелік материалдар</h2>
+            <p>Құрметті ұстаз! Материалдарды жүктеп алу үшін жүйеге авторлануыңыз қажет. Мұнда сіз сабақ жоспарларын (ҚМЖ), презентациялар мен тәжірибелік тапсырмалар жинағын таба аласыз.</p>
+            <button class="btn btn-primary" style="margin-top: 20px;" onclick="closeModal('teacherModal')">Терезені жабу</button>
+        </div>
+    </div>
+
+    <div class="chat-widget">
+        <button class="chat-toggle" onclick="toggleChat()">
+            <i class="fas fa-comment-dots"></i>
+        </button>
+        <div class="chat-box" id="chatBox">
+            <div class="chat-header">
+                <span><i class="fas fa-robot"></i> AI Ментор</span>
+                <button class="close-chat" onclick="toggleChat()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot-message">
+                    Сәлем! Мен EduAI платформасының жасанды интеллект көмекшісімін. Сізге Python немесе ЖИ құралдары бойынша қандай көмек керек?
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" id="userInput" placeholder="Сұрағыңызды жазыңыз..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Прогресті оқу (localStorage арқылы)
+        window.addEventListener('DOMContentLoaded', () => {
+            // Егер бұрын сақталған ұпай болса соны аламыз, болмаса 0
+            let currentXP = localStorage.getItem('eduai_xp') ? parseInt(localStorage.getItem('eduai_xp')) : 0;
+            // Максималды ұпай 500 деп алайық (мысалы 5 модуль * 100 ұпай)
+            let maxXP = 500; 
+            
+            let percent = Math.min(Math.round((currentXP / maxXP) * 100), 100);
+
+            document.getElementById('userXP').innerText = currentXP;
+            document.getElementById('userProgressPercent').innerText = percent;
+            document.getElementById('progressBar').style.width = percent + '%';
+        });
+        // Модальды терезелерді басқару
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Модаль сыртын шерткенде жабылуы
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Чат-ботты басқару
+        function toggleChat() {
+            const chatBox = document.getElementById('chatBox');
+            if (chatBox.style.display === 'flex') {
+                chatBox.style.display = 'none';
+            } else {
+                chatBox.style.display = 'flex';
+            }
+        }
+
+        function sendMessage() {
+            const inputField = document.getElementById('userInput');
+            const messageText = inputField.value.trim();
+            
+            if (messageText !== '') {
+                const chatMessages = document.getElementById('chatMessages');
+                
+                // Оқушының хабарламасы
+                const userMsgDiv = document.createElement('div');
+                userMsgDiv.className = 'message user-message';
+                userMsgDiv.innerText = messageText;
+                chatMessages.appendChild(userMsgDiv);
+                
+                inputField.value = '';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                // Боттың жауабы (Имитация)
+                setTimeout(() => {
+                    const botMsgDiv = document.createElement('div');
+                    botMsgDiv.className = 'message bot-message';
+                    botMsgDiv.innerText = "Бұл сұрақ өте орынды! Мен әлі әзірлену үстіндемін, бірақ жақында сіздің сұрағыңызға толыққанды жауап бере аламын. Python-ды бірге үйренейік!";
+                    chatMessages.appendChild(botMsgDiv);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }, 1000);
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+window.addEventListener('DOMContentLoaded', () => {
+    const isRegistered = localStorage.getItem('eduai_is_registered');
+    if (!isRegistered) {
+        window.location.href = 'register.html';
+    }
+});
+// Түнгі режимді қосу/өшіру және жадта сақтау
+function toggleTheme() {
+    const body = document.body;
+    const themeIcon = document.getElementById('theme-icon');
+    body.classList.toggle('dark-mode');
+    
+    if (body.classList.contains('dark-mode')) {
+        localStorage.setItem('eduai_theme', 'dark');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    } else {
+        localStorage.setItem('eduai_theme', 'light');
+        if(themeIcon) themeIcon.className = 'fas fa-moon';
+    }
+}
+
+// Бет жүктелгенде оқушының бұрынғы таңдауын тексеру
+window.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('eduai_theme');
+    const themeIcon = document.getElementById('theme-icon');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        if(themeIcon) themeIcon.className = 'fas fa-sun';
+    }
+});
+    </script>
+
+</body>
+</html>
